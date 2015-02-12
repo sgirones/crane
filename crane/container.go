@@ -9,6 +9,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Container interface {
@@ -84,6 +85,7 @@ type RunParameters struct {
 	RawVolumesFrom []string    `json:"volumes-from" yaml:"volumes-from"`
 	RawWorkdir     string      `json:"workdir" yaml:"workdir"`
 	RawCmd         interface{} `json:"cmd" yaml:"cmd"`
+	Unique         bool        `json:"unique" yaml:"unique"`
 }
 
 type RmParameters struct {
@@ -412,6 +414,9 @@ func (c *container) Create(cmd string) {
 		if cmd != "" {
 			c.RunParams.RawCmd = cmd
 		}
+		if c.RunParams.Unique {
+			c.RawName = c.RawName + "-" + strconv.FormatInt(time.Now().UnixNano(), 10)
+		}
 
 		fmt.Printf("Creating container %s ... ", c.Name())
 		args := append([]string{"create"}, c.createArgs()...)
@@ -429,6 +434,10 @@ func (c *container) Run(cmd string) {
 	} else {
 		if cmd != "" {
 			c.RunParams.RawCmd = cmd
+		}
+
+		if c.RunParams.Unique {
+			c.RawName = c.RawName + "-" + strconv.FormatInt(time.Now().UnixNano(), 10)
 		}
 
 		fmt.Printf("Running container %s ... ", c.Name())
