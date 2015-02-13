@@ -26,7 +26,7 @@ type Container interface {
 	Provision(nocache bool)
 	ProvisionOrSkip(update bool, nocache bool)
 	Create(cmd string)
-	Run(cmd string)
+	Run(cmd string, tty bool)
 	Start()
 	RunOrStart()
 	Kill()
@@ -395,7 +395,7 @@ func (c *container) RunOrStart() {
 	if c.Exists() {
 		c.Start()
 	} else {
-		c.Run("")
+		c.Run("", false)
 	}
 }
 
@@ -425,7 +425,7 @@ func (c *container) Create(cmd string) {
 }
 
 // Run container, or start it if already existing
-func (c *container) Run(cmd string) {
+func (c *container) Run(cmd string, tty bool) {
 	if c.Exists() {
 		print.Noticef("Container %s does already exist. Use --recreate to recreate.\n", c.Name())
 		if !c.Running() {
@@ -434,6 +434,10 @@ func (c *container) Run(cmd string) {
 	} else {
 		if cmd != "" {
 			c.RunParams.RawCmd = cmd
+		}
+
+		if tty {
+			c.RunParams.Tty = true
 		}
 
 		if c.RunParams.Unique {

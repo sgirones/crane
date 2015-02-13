@@ -23,6 +23,7 @@ type Options struct {
 	config              string
 	target              []string
 	cmd                 string
+	tty                 bool
 }
 
 var options Options
@@ -94,7 +95,7 @@ If no Dockerfile is given, it will pull the image(s) from the given registry.`,
 		Short: "Run the containers",
 		Long:  `run will call docker run for all targeted containers.`,
 		Run: configCommand(func(config Config) {
-			config.TargetedContainers().run(options.recreate, options.cmd)
+			config.TargetedContainers().run(options.recreate, options.cmd, options.tty)
 		}, false),
 	}
 
@@ -244,6 +245,7 @@ See the corresponding docker commands for more information.`,
 	cmdCreate.Flags().StringVarP(&options.cmd, "cmd", "", "", "Overwrites defined command")
 
 	cmdRun.Flags().BoolVarP(&options.recreate, "recreate", "r", false, "Recreate containers (force-remove containers first)")
+	cmdRun.Flags().BoolVarP(&options.tty, "tty", "", false, "enable tty. Overwrites configuration")
 	cmdRun.Flags().StringVarP(&options.cmd, "cmd", "", "", "Overwrites defined command")
 
 	cmdRm.Flags().BoolVarP(&options.forceRm, "force", "f", false, "Kill containers if they are running first")

@@ -58,13 +58,13 @@ func (containers Containers) create(recreate bool, cmd string) {
 
 // Run containers.
 // When recreate is true, removes existing containers first.
-func (containers Containers) run(recreate bool, cmd string) {
+func (containers Containers) run(recreate bool, cmd string, tty bool) {
 	if recreate {
 		containers.rm(true)
 	}
 
 	for _, container := range containers {
-		container.Run(cmd)
+		container.Run(cmd, tty)
 	}
 }
 
